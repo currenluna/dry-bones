@@ -75,6 +75,8 @@
         }
         button {
             width: 80%;
+            height: 80%;
+            max-height: 100px;
         }
         svg {
             width: 35px;
