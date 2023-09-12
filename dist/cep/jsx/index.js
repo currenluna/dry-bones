@@ -143,4 +143,4 @@ switch (BridgeTalk.appName) {
 
 var host = typeof $ !== "undefined" ? $ : window;
 host[ns] = main;
-})(this);
+})(this);//# sourceMappingURL=index.js.map
