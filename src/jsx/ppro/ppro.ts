@@ -77,6 +77,10 @@ export const createFolderStructure = () => {
     f08.createBin("02 Final");
 };
 
-// export const onEnterDown = () => {
+export const createSubBin = (line: string) => {
+    alert(line);
+}
 
-// }
+export const createRootBin = (line: string) => {
+    myRoot.createBin(line);
+}

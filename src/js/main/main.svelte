@@ -1,26 +1,55 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { evalTS, subscribeBackgroundColor } from "../lib/utils/bolt";
+    import { text } from 'node:stream/consumers';
 
-    let text_path = "";
-    let bins = [{path: "01 Cuts"}, {path: "01 Cuts/00 Nests"}, {path: "01 Cuts/01 Raw"}];
+    let text_area = "Test\n/01 Cuts\n//00 Nests";
+    let text_lines = text_area.split("\n");
 
     let backgroundColor: string = "#282c34";
 
     const createFolderStructure = () => evalTS("createFolderStructure");
+    const createUserBin = (line: string) => evalTS("createSubBin", line);
 
-    // Append item to list on [Enter] key press
-    const onEnterDown = (e: KeyboardEvent) => {
-        if (e.code === "Enter" && text_path.length > 0) {
-            bins = [...bins, {path: text_path}]
-            text_path = "";
+    // Count the number of characters prefixing a line in the editor
+    const countConsecutiveChars = (str: string) => {
+        let count = 1;
+        let prevChar = str[0];
+        for (let i = 1; i < str.length; i++) {
+            if (str[i] === prevChar) {
+                count++;
+            } else {
+                break;
+            }
+            prevChar = str[i];
         }
+        return count;
     }
 
-    // Remove item from list
-    const deleteItem = (index: number) => {
-        bins.splice(index, 1);
-        bins = bins;
+    // Read each line from text editor and create bin for each line
+    const readLines = () => {
+        if (text_area.length === 0) {
+            console.log("empty");
+        } else {
+            let line_current: string;
+            let line_last: string;
+            let line_next: string;
+
+            text_lines = text_area.split("\n");
+            for (let i = 0; i < text_lines.length; i++) {
+                const line = text_lines[i];
+
+                // Comment
+                if (line.trim()[0] === "#") {
+                    console.log("ignore line");
+                }
+                
+                console.log(countConsecutiveChars(line));
+                // evalTS("createSubBin", line);
+            }
+
+        }
+
     }
 
     // Background color update
@@ -33,29 +62,20 @@
 
 <div class="app" style="--background-color: {backgroundColor}">
     <div class="container">
-        <h1>Dry Bones</h1>
-        <div class="list">
-            {#each bins as item, index}
-                <div class="list-item">
-                    <span>{item.path}</span>
-                    <button class="delete-item" on:click={() => deleteItem(index)}>X</button>
-                </div>
-            {/each}
+        <div class="header">
+            <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAADE0lEQVR4nO2du2sVQRSHP1ZRb1BMbBRfpY29UUuxCoJaiJ2VIIJ2YqMWSkBBRTHKTSs2IoKVguB/4KMKWNj6AvNQY4zGx8rgDF4ku7m7d7M7mfl9cKp7d2b2Y5jdObucBSGEEEII8Y8twDDwHPgCTAPPgAvA5o7/iZKsAa4Bc0CaEd+Bq8Dqsp3EzjbgZY7g/+MVsL3pQS81hoCPBSS7+AwcaHrwS4VjwK8Skl2YY482fRK+c6RHyS5+S3Y2h4GfFUh2Ydo6lNNflOwCvlUo2cUssLPpk/OFjcCbRZDs4p3utWEV8GIRJbt4CqwkYm7VINnFdSJln707qEu06Ws/kbEBmKhRsosPwHoi4n4Dkl3cJaIlI204DhI4a4HXHoh+CwwQMDc8kOzCjCVYJj0Q7GKcgJnwQHDnHUiwXPFAsAszlmBZYU9wvOEl47Idi5iHLHGiYlKJrodUoiU6KFLNaIn2jj6b7C/zzkZVMQXcBFoEzKgHGxUXZixBkgBfPRDsYsaOKTgSiY5z6WgTMC1gxF6QmhI8aXPRQV8MeyFLnKiYVKLrIZVoiQ6KVDNaor2mr8a8RxT5DZ82L8HmN3zbjs+Emt/IIpHosJeONhHSqjHvofxGAbIkiopJJboeUomW6KBINaMlOrocyFTMOY0mNjLR5TSa2prPxJbTKEoi0Utr6WjXON4ocyCTemejd3QfXROpNiwSHQwDOTO6v+nBhcTuHNGmwpioiJEc0dHWSqqarbbmaJboTyq31jvLgcdd3D8/ApZV0F+02/E7BTYrt5XfKI6p5PWwxM7wCbCpRH/RsQ44u0ABlR82sn43x56xbQn+JvjNhW4QOAk8sPX7F5q1pr708S7+N23bPAHssH2ZPqOgr8c3SM93tDVcso0onsKMlpRjinefmqe90z0U9g72KUxSMqlvatTtyWl3L/C+RLvBPoVJCoqes58G6SaX0W93iHmfEYlGdLdLhymsfdF+5KYo5phLXc7wdixPT2atkDHgnr2tG6xoliW25Pw52/aY7cv0qacwQgghhBBCCEEHfwAEI1+0Z6xilQAAAABJRU5ErkJggg==">
+            <h1>Dry Bones</h1>
         </div>
-        <div class="inputs-container">
-            <input
-                bind:value={text_path}
-                on:keydown={onEnterDown}
-                type="text"
-                placeholder="Add a bin path, then hit enter"
-            >
-            <div class="button-container">
-                <button class="solid">Run</button>
-                <button class="outline">Save</button>
-                <button class="preset-1">1</button>
-                <button class="preset-2">2</button>
-                <button class="preset-3">3</button>
-            </div>
+        <textarea rows="10" class="text-editor" bind:value={text_area}></textarea>
+        <div class="button-container">
+            <button class="button-solid" on:click={readLines}>Run</button>
+            <button class="button-outline">Save</button>
+            <button class="button-preset-1">1</button>
+            <button class="button-preset-2">2</button>
+            <button class="button-preset-3">3</button>
+        </div>
+        <div class="credit">
+            <a href="https://icons8.com/icon/DIMe9ZTnqdy3/fish-bone">Fish Bone</a> icon by <a href="https://icons8.com">Icons8</a>
         </div>
     </div>
 </div>
@@ -80,49 +100,72 @@
     .container {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        flex-shrink: 0;
+        justify-content: space-around;
+        align-items: stretch;
         gap: 4px;
         width: 80%;
+    }
+    .header {
+        display: flex;
+    }
+    .logo {
+        width: 30px;
+        filter: invert(1);
+        align-self: center;
     }
     h1 {
         margin: .5rem;
         font-size: 1.8rem;
+        display: inline;
     }
-    .list {
-        width: 100%;
-        height: 100px;
-        overflow-y: scroll;
-        scroll-behavior: auto;
-        background-color: white;
-        border-radius: $border-radius;
-    }
-    .list-item {
-        color: black;
-        border-bottom: 1px solid black;
-        display: flex;
-        justify-content: space-between;
-        padding: .5rem;
-    }
-    .inputs-container {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+    .text-editor {
+        resize: none;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        padding: 1rem;
+        flex: 1;
     }
     .button-container {
         display: flex;
-        gap: 7px;
+        gap: 4px;
+        height: 40px;
     }
     button {
-        background-color: white;
         padding: .5rem;
-        border-radius: 0;
         border: none;
         margin: 0;
-        transition: all ease .5s;
+        flex: 1;
+    }
+    .button-solid {
+        background-color: white;
+        flex: 1 1 33%;
+        border-bottom-left-radius: 5px;
+    }
+    .button-outline {
+        color: white;
+        background-color: rgba(0, 0, 0, 0);
+        border: 2px solid white;
+        flex: 1 1 33%;
+    }
+    .button-preset-1 {
+        background-color: white;
+        flex: 1 1 auto;
+    }
+    .button-preset-2 {
+        background-color: white;
+        flex: 1 1 auto;
+    }
+    .button-preset-3 {
+        background-color: white;
+        flex: 1 1 auto;
+        border-bottom-right-radius: 5px;
     }
     button:hover {
         cursor: pointer;
+    }
+    a {
+        color: white;
+        white-space: nowrap;
     }
     @media screen and (max-width: 180px ), screen and (max-height: 180px) {
         h1 {

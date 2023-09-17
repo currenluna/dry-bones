@@ -127,14 +127,18 @@ var createFolderStructure = function createFolderStructure() {
   f08.createBin("01 Rough");
   f08.createBin("02 Final");
 };
-
-// export const onEnterDown = () => {
-
-// }
+var createSubBin = function createSubBin(line) {
+  alert(line);
+};
+var createRootBin = function createRootBin(line) {
+  myRoot.createBin(line);
+};
 
 var ppro = /*#__PURE__*/__objectFreeze({
   __proto__: null,
-  createFolderStructure: createFolderStructure
+  createFolderStructure: createFolderStructure,
+  createSubBin: createSubBin,
+  createRootBin: createRootBin
 });
 
 var main;
