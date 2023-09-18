@@ -1,19 +1,44 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { evalTS, subscribeBackgroundColor } from "../lib/utils/bolt";
-    import { text } from 'node:stream/consumers';
 
     let text_area = "Test\n/01 Cuts\n//00 Nests";
     let text_lines = text_area.split("\n");
 
     let backgroundColor: string = "#282c34";
-
+    
     const createFolderStructure = () => evalTS("createFolderStructure");
-    const createUserBin = (line: string) => evalTS("createSubBin", line);
+    // const createFolder = (id: string) => evalTS("createFolder", line);
+    const getFolder = () => {
+        const result = evalTS("getFolder").then((res) => {
+            alert(res.nodeId);
+        });
+    };
+    
+    const getItemById = (item: Object, id: string) => {
+        evalTS("getItemById", item, id)
+    }
+    
+    const rootItem = evalTS("getRootItem")
+        .then((res) => {
+            return res;
+        });
+
+    const printRootItem = () => {
+        rootItem.then((r) => {
+            alert(r);
+        });
+    }
+    printRootItem();
 
     // Count the number of characters prefixing a line in the editor
-    const countConsecutiveChars = (str: string) => {
-        let count = 1;
+    const countConsecutivePrefixChars = (str: string, char: string) => {
+        let count = 0;
+        if (str[0] === char) {
+            count++;
+        } else {
+            return count;
+        }
         let prevChar = str[0];
         for (let i = 1; i < str.length; i++) {
             if (str[i] === prevChar) {
@@ -23,29 +48,41 @@
             }
             prevChar = str[i];
         }
-        return count;
+        return count; 
     }
 
     // Read each line from text editor and create bin for each line
-    const readLines = () => {
-        if (text_area.length === 0) {
-            console.log("empty");
-        } else {
-            let line_current: string;
-            let line_last: string;
-            let line_next: string;
 
+    // create a stack with objects {id, # slashes, pathname}
+    // iterate over each line
+    // make sure the first readable line isn't a "/"
+    // if first char is not "/", clear stack and add incoming lines to stack
+    // if first char is a "/", and # slashes is one more than one of the stack objects, find the most recent objects with one less slash and create the folder within that folder
+    // if first char is a "/", and the diff in # slashes between current line and last line is greater than 1, throw an error
+    // if first char is a "#", skip over the line
+
+    const parseSingleLine = (line: string) => {
+        line = line.trim();
+        // Comment
+        if (line[0] === "#") {
+            evalTS("alertUser", "Comment");
+        }
+        
+        console.log(countConsecutivePrefixChars(line, "/"));
+        // evalTS("createSubBin", line);
+    }
+
+    const readLines = () => {
+        let currentTree = new Array();
+        if (text_area.length === 0) {
+            evalTS("alertUser", "Empty text editor");
+        } else {
+            // Iterate over array of lines
             text_lines = text_area.split("\n");
             for (let i = 0; i < text_lines.length; i++) {
                 const line = text_lines[i];
-
-                // Comment
-                if (line.trim()[0] === "#") {
-                    console.log("ignore line");
-                }
-                
-                console.log(countConsecutiveChars(line));
-                // evalTS("createSubBin", line);
+                if (line[0] != "/")
+                parseSingleLine(line);
             }
 
         }
@@ -70,7 +107,7 @@
         <div class="button-container">
             <button class="button-solid" on:click={readLines}>Run</button>
             <button class="button-outline">Save</button>
-            <button class="button-preset-1">1</button>
+            <button class="button-preset-1" on:click={getFolder}>1</button>
             <button class="button-preset-2">2</button>
             <button class="button-preset-3">3</button>
         </div>

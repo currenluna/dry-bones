@@ -15,7 +15,7 @@ const binsExist = () => {
     } else {
         return false;
     }
-}
+};
 
 export const createFolderStructure = () => {
 
@@ -77,10 +77,30 @@ export const createFolderStructure = () => {
     f08.createBin("02 Final");
 };
 
-export const createSubBin = (line: string) => {
-    alert(line);
-}
+export const alertUser = (message: string) => {
+    alert(message);
+};
 
-export const createRootBin = (line: string) => {
-    myRoot.createBin(line);
+
+// Make a folder within the item, return the folder's ID
+export const getFolder = () => {
+    // return myRoot.children[0];
+    return myRoot;
+};
+
+// Make a folder within the item, return the folder's ID
+export const createFolder = (item: ProjectItem, name: string) => {
+    const result = item.createBin(name);
+    return result;
+};
+
+export const getItemById = (item: ProjectItem, id: string) => {
+    for (let i = 0; i < item.children.numItems; i++) {
+        const child = item.children[i];
+        alert(String(child.type));
+    }
+};
+
+export const getRootItem = () => {
+    return myRoot;
 }

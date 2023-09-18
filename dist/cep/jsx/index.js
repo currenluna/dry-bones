@@ -127,18 +127,39 @@ var createFolderStructure = function createFolderStructure() {
   f08.createBin("01 Rough");
   f08.createBin("02 Final");
 };
-var createSubBin = function createSubBin(line) {
-  alert(line);
+var alertUser = function alertUser(message) {
+  alert(message);
 };
-var createRootBin = function createRootBin(line) {
-  myRoot.createBin(line);
+
+// Make a folder within the item, return the folder's ID
+var getFolder = function getFolder() {
+  // return myRoot.children[0];
+  return myRoot;
+};
+
+// Make a folder within the item, return the folder's ID
+var createFolder = function createFolder(item, name) {
+  var result = item.createBin(name);
+  return result;
+};
+var getItemById = function getItemById(item, id) {
+  for (var i = 0; i < item.children.numItems; i++) {
+    var child = item.children[i];
+    alert(String(child.type));
+  }
+};
+var getRootItem = function getRootItem() {
+  return myRoot;
 };
 
 var ppro = /*#__PURE__*/__objectFreeze({
   __proto__: null,
   createFolderStructure: createFolderStructure,
-  createSubBin: createSubBin,
-  createRootBin: createRootBin
+  alertUser: alertUser,
+  getFolder: getFolder,
+  createFolder: createFolder,
+  getItemById: getItemById,
+  getRootItem: getRootItem
 });
 
 var main;
