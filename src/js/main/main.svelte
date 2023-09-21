@@ -1,35 +1,41 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { evalTS, subscribeBackgroundColor } from "../lib/utils/bolt";
+    import { create } from 'domain';
 
     let text_area = "Test\n/01 Cuts\n//00 Nests";
     let text_lines = text_area.split("\n");
+    let r: object;
+    let n;
 
     let backgroundColor: string = "#282c34";
     
     const createFolderStructure = () => evalTS("createFolderStructure");
-    // const createFolder = (id: string) => evalTS("createFolder", line);
+    const createFolder = (item: object, name: string) => {
+        evalTS("createFolder", item, name);
+    };
     const getFolder = () => {
         const result = evalTS("getFolder").then((res) => {
             alert(res.nodeId);
         });
     };
     
-    const getItemById = (item: Object, id: string) => {
-        evalTS("getItemById", item, id)
-    }
+    // const getItemById = (item: Object, id: string) => {
+    //     evalTS("getItemById", item, id)
+    // }
     
-    const rootItem = evalTS("getRootItem")
-        .then((res) => {
-            return res;
-        });
-
-    const printRootItem = () => {
-        rootItem.then((r) => {
-            alert(r);
-        });
+    const getRootItem = async () => {
+        const rootItem = await evalTS("getRootItem");
+        console.log(rootItem);
+        r = rootItem;
+        // alert(r);
     }
-    printRootItem();
+
+    const getAllItemInfo = async () => {
+        const names = await evalTS("getAllItemInfo");
+        n = names;
+        alert(n);
+    }
 
     // Count the number of characters prefixing a line in the editor
     const countConsecutivePrefixChars = (str: string, char: string) => {
@@ -86,7 +92,6 @@
             }
 
         }
-
     }
 
     // Background color update
@@ -94,6 +99,7 @@
         if (window.cep) {
             subscribeBackgroundColor((c: string) => (backgroundColor = c))
         }
+        getRootItem();
     })
 </script>
 
@@ -107,9 +113,9 @@
         <div class="button-container">
             <button class="button-solid" on:click={readLines}>Run</button>
             <button class="button-outline">Save</button>
-            <button class="button-preset-1" on:click={getFolder}>1</button>
-            <button class="button-preset-2">2</button>
-            <button class="button-preset-3">3</button>
+            <button class="button-preset-1" on:click={getRootItem}>1</button>
+            <button class="button-preset-2" on:click={getAllItemInfo}>2</button>
+            <button class="button-preset-3" on:click={() => createFolder(r, "hi")}>3</button>
         </div>
         <div class="credit">
             <a href="https://icons8.com/icon/DIMe9ZTnqdy3/fish-bone">Fish Bone</a> icon by <a href="https://icons8.com">Icons8</a>

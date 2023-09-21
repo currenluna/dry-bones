@@ -88,19 +88,36 @@ export const getFolder = () => {
     return myRoot;
 };
 
-// Make a folder within the item, return the folder's ID
+// Make a folder within the item, return the folder object
 export const createFolder = (item: ProjectItem, name: string) => {
     const result = item.createBin(name);
     return result;
 };
 
-export const getItemById = (item: ProjectItem, id: string) => {
-    for (let i = 0; i < item.children.numItems; i++) {
-        const child = item.children[i];
-        alert(String(child.type));
-    }
-};
+// export const getItemById = (item: ProjectItem, id: string) => {
+//     for (let i = 0; i < item.children.numItems; i++) {
+//         const child = item.children[i];
+//         alert(String(child.type));
+//     }
+// };
 
 export const getRootItem = () => {
     return myRoot;
+};
+
+// Iterate over every Project Item recursively
+let names: string[] = [];
+export const getItemInfo = (item: ProjectItem) => {
+    for (let i = 0; i < item.children.numItems; i++) {
+        const child = item.children[i];
+        getItemInfo(child);
+        names.push(child.name);
+    }
+};
+
+// Start iterating via Root Item and return array to JS side
+export const getAllItemInfo = () => {
+    names = [];
+    getItemInfo(myRoot);
+    return names;
 }

@@ -137,19 +137,38 @@ var getFolder = function getFolder() {
   return myRoot;
 };
 
-// Make a folder within the item, return the folder's ID
+// Make a folder within the item, return the folder object
 var createFolder = function createFolder(item, name) {
   var result = item.createBin(name);
   return result;
 };
-var getItemById = function getItemById(item, id) {
-  for (var i = 0; i < item.children.numItems; i++) {
-    var child = item.children[i];
-    alert(String(child.type));
-  }
-};
+
+// export const getItemById = (item: ProjectItem, id: string) => {
+//     for (let i = 0; i < item.children.numItems; i++) {
+//         const child = item.children[i];
+//         alert(String(child.type));
+//     }
+// };
+
 var getRootItem = function getRootItem() {
   return myRoot;
+};
+
+// Iterate over every Project Item recursively
+var names = [];
+var getItemInfo = function getItemInfo(item) {
+  for (var i = 0; i < item.children.numItems; i++) {
+    var child = item.children[i];
+    getItemInfo(child);
+    names.push(child.name);
+  }
+};
+
+// Start iterating via Root Item and return array to JS side
+var getAllItemInfo = function getAllItemInfo() {
+  names = [];
+  getItemInfo(myRoot);
+  return names;
 };
 
 var ppro = /*#__PURE__*/__objectFreeze({
@@ -158,8 +177,9 @@ var ppro = /*#__PURE__*/__objectFreeze({
   alertUser: alertUser,
   getFolder: getFolder,
   createFolder: createFolder,
-  getItemById: getItemById,
-  getRootItem: getRootItem
+  getRootItem: getRootItem,
+  getItemInfo: getItemInfo,
+  getAllItemInfo: getAllItemInfo
 });
 
 var main;
