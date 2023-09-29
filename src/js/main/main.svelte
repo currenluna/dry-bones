@@ -1,43 +1,31 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { evalTS, subscribeBackgroundColor } from "../lib/utils/bolt";
-    import { create } from 'domain';
 
     let text_area = "Test\n/01 Cuts\n//00 Nests";
     let text_lines = text_area.split("\n");
-    let r: object;
-    let n;
+
+    let root: object;
 
     let backgroundColor: string = "#282c34";
     
-    const createFolderStructure = () => evalTS("createFolderStructure");
-    const createFolder = (item: object, name: string) => {
-        evalTS("createFolder", item, name);
-    };
-    const getFolder = () => {
-        const result = evalTS("getFolder").then((res) => {
-            alert(res.nodeId);
-        });
-    };
+    const createBin = (name: string) => evalTS("createBin", name);
     
-    // const getItemById = (item: Object, id: string) => {
-    //     evalTS("getItemById", item, id)
-    // }
-    
+    const testFunc = () => {
+        evalTS("testFunc", "000f4253");
+    };
+
+
     const getRootItem = async () => {
-        const rootItem = await evalTS("getRootItem");
-        console.log(rootItem);
-        r = rootItem;
-        // alert(r);
+        root = await evalTS("getRootItem");
     }
 
-    const getAllItemInfo = async () => {
-        const names = await evalTS("getAllItemInfo");
-        n = names;
-        alert(n);
-    }
+    // const getAllItemInfo = async () => {
+    //     const names = await evalTS("getAllItemInfo");
+    // }
 
     // Count the number of characters prefixing a line in the editor
+    // Thanks, StackOverflow
     const countConsecutivePrefixChars = (str: string, char: string) => {
         let count = 0;
         if (str[0] === char) {
@@ -55,7 +43,11 @@
             prevChar = str[i];
         }
         return count; 
-    }
+    };
+
+    const alertUser = (message: string) => {
+        evalTS("alertUser", message);
+    };
 
     // Read each line from text editor and create bin for each line
 
@@ -69,25 +61,31 @@
 
     const parseSingleLine = (line: string) => {
         line = line.trim();
-        // Comment
+        const numSlashes: number = countConsecutivePrefixChars(line, "/");
+
+        // Ignore Comment Lines
         if (line[0] === "#") {
-            evalTS("alertUser", "Comment");
+            console.log("Comment");
+        } else if (line[0] !== "/") {
+            createBin(line);
+        } else {
+            // Create a folder starting after slashes
+            createBin(line.substring(numSlashes));
         }
         
-        console.log(countConsecutivePrefixChars(line, "/"));
+        // console.log(countConsecutivePrefixChars(line, "/"));
         // evalTS("createSubBin", line);
     }
 
     const readLines = () => {
-        let currentTree = new Array();
+        // let currentTree = new Array();
         if (text_area.length === 0) {
-            evalTS("alertUser", "Empty text editor");
+            alertUser("Empty Text Editor");
         } else {
             // Iterate over array of lines
             text_lines = text_area.split("\n");
             for (let i = 0; i < text_lines.length; i++) {
                 const line = text_lines[i];
-                if (line[0] != "/")
                 parseSingleLine(line);
             }
 
@@ -99,7 +97,6 @@
         if (window.cep) {
             subscribeBackgroundColor((c: string) => (backgroundColor = c))
         }
-        getRootItem();
     })
 </script>
 
@@ -112,10 +109,10 @@
         <textarea rows="10" class="text-editor" bind:value={text_area}></textarea>
         <div class="button-container">
             <button class="button-solid" on:click={readLines}>Run</button>
-            <button class="button-outline">Save</button>
-            <button class="button-preset-1" on:click={getRootItem}>1</button>
-            <button class="button-preset-2" on:click={getAllItemInfo}>2</button>
-            <button class="button-preset-3" on:click={() => createFolder(r, "hi")}>3</button>
+            <!-- <button class="button-outline" on:click={testFunc}>Save</button> -->
+            <button class="button-preset-1" on:click={testFunc}>1</button>
+            <button class="button-preset-2">2</button>
+            <button class="button-preset-3">3</button>
         </div>
         <div class="credit">
             <a href="https://icons8.com/icon/DIMe9ZTnqdy3/fish-bone">Fish Bone</a> icon by <a href="https://icons8.com">Icons8</a>
