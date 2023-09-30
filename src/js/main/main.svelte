@@ -12,7 +12,7 @@
     const createBin = (name: string) => evalTS("createBin", name);
     
     const testFunc = () => {
-        evalTS("testFunc", "000f4253");
+        evalTS("testFunc");
     };
 
 
