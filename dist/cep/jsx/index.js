@@ -49,47 +49,87 @@ var config = {
 };
 
 var ns = config.id;
+// Count the number of characters prefixing a line in the editor
+// Thanks, StackOverflow
+var countConsecPrefixChars = function countConsecPrefixChars(str, _char) {
+  var count = 0;
+  if (str[0] === _char) {
+    count++;
+  } else {
+    return count;
+  }
+  var prevChar = str[0];
+  for (var i = 1; i < str.length; i++) {
+    if (str[i] === prevChar) {
+      count++;
+    } else {
+      break;
+    }
+    prevChar = str[i];
+  }
+  return count;
+};
 
-var myRoot = app.project.rootItem;
+// General Helpers
+
 var alertUser = function alertUser(message) {
-  return alert(message);
+  alert(message);
 };
 
-// Make a folder within the item, return the folder object
-var createBin = function createBin(name) {
-  var bin = myRoot.createBin(name);
-  return bin;
+// Recursively search a given item, provided a name
+var getItemByName = function getItemByName(item, name) {
+  // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
+  if (item === undefined) {
+    // alert("case 1: returning undefined");
+    return undefined;
+  }
+  if (item.name === name) {
+    // alert("case 2: returning item");
+    return item;
+  }
+  if (item.type === 2 || item.type === 3) {
+    // only Search BINs and ROOT
+    // alert("case 3: entering for loop on " + item.name + "'s children");
+    for (var i = 0; i < item.children.numItems; i++) {
+      var child = item.children[i];
+      var result = getItemByName(child, name);
+      if (result !== undefined) {
+        return result;
+      }
+    }
+  }
+  // alert("case 4: returning undefined");
+  return undefined;
 };
 
-// // Search for a folder in Root, provided an id
-// export const getFolderById = (id: string) => {
-//     for (let i = 0; i < myRoot.children.numItems; i++) {
-//         const child = myRoot.children[i];
-//         if (child.nodeId === id) {
-//             return child;
-//         } else if (child.type === 2) { // BIN === 2
-//             searchFolder(child, id);
-//         }
-//     }
-// };
-
-// 000f4240 - Root
-// 000f424f - Sequence 01
-// 000f4250 - Top
-// 000f4251 - Other
-// 000f4252 - Mid
-// 000f4253 - Low
-
+var root = app.project.rootItem;
 var testFunc = function testFunc() {
-  // alert(printChildren(myRoot));
-  // traverseItem(myRoot);
-
-  var id = "000f4251";
-  var item = findItemById(myRoot, id);
+  // const item = getItemById(root, "000f4253");
+  var item = getItemByName(root, "Sequence 02");
   if (item !== undefined) {
     alert("Found " + item.name + "!");
   } else {
-    alert("Item with id " + id + " does not exist");
+    alert("undefined");
+  }
+};
+var parseText = function parseText(text) {
+  // Iterate over text lines
+  var lines = text.split("\n");
+  var stack = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var prefixCount = countConsecPrefixChars(line, "/");
+    if (line[0] === "#") {
+      continue;
+    } else if (line[0] !== "/") {
+      // Top-level folder
+      var topBin = root.createBin(line);
+      stack.push({
+        name: topBin.name,
+        id: topBin.nodeId,
+        prefixCount: prefixCount
+      });
+    } else if (line[0] === "/") ;
   }
 };
 
@@ -101,92 +141,11 @@ var testFunc = function testFunc() {
 // ||--- Low (000f4253)
 // |- Other (000f4251)
 
-// Recursively search a given item, provided a nodeId
-var findItemById = function findItemById(item, id) {
-  alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
-  if (item === undefined) {
-    alert("case 1: returning undefined");
-    return undefined;
-  }
-  if (item.nodeId === id) {
-    alert("case 2: returning item");
-    return item;
-  }
-  if (item.type === 2 || item.type === 3) {
-    // only Search BINs and ROOT
-    alert("case 3: entering for loop on " + item.name + "'s children");
-    for (var i = 0; i < item.children.numItems; i++) {
-      var child = item.children[i];
-      var result = findItemById(child, id);
-      if (result !== undefined) {
-        return result;
-      }
-    }
-  }
-  alert("case 4: returning undefined");
-  return undefined;
-};
-
-// findItemById(myRoot, 000f4251)
-// 
-
-// traverseItem(myRoot)
-//      alert(myRoot.Name)
-//          traverseItem(Sequence 01)
-
-var printChildren = function printChildren(item) {
-  var result = "";
-  for (var i = 0; i < item.children.numItems; i++) {
-    var child = item.children[i];
-    result += child.name + ": " + child.nodeId;
-    if (i !== item.children.numItems - 1) {
-      result += ", ";
-    }
-  }
-  return result;
-};
-
-// Recursively traverse all bins
-var traverseItem = function traverseItem(item) {
-  alert(item.name);
-  for (var i = 0; i < item.children.numItems; i++) {
-    var child = item.children[i];
-    if (child.type === 2) {
-      // Only traverse BIN type
-      traverseItem(child);
-    }
-  }
-};
-var getRootItem = function getRootItem() {
-  return myRoot;
-};
-
-// // Iterate over every Project Item recursively
-// let names: string[] = [];
-// export const getItemInfo = (item: ProjectItem) => {
-//     for (let i = 0; i < item.children.numItems; i++) {
-//         const child = item.children[i];
-//         getItemInfo(child);
-//         names.push(child.name);
-//     }
-// };
-
-// // Start iterating via Root Item and return array to JS side
-// export const getAllItemInfo = () => {
-//     names = [];
-//     getItemInfo(myRoot);
-//     return names;
-// }
-
 var ppro = /*#__PURE__*/__objectFreeze({
   __proto__: null,
   alertUser: alertUser,
-  createBin: createBin,
   testFunc: testFunc,
-  findItemById: findItemById,
-  printChildren: printChildren,
-  traverseItem: traverseItem,
-  getRootItem: getRootItem
+  parseText: parseText
 });
 
 var main;

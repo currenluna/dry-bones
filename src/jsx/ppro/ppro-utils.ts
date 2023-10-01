@@ -1,3 +1,9 @@
+// General Helpers
+
+export const alertUser = (message: string) => {
+  alert(message);
+}
+
 // ProjectItem Helpers
 
 export const forEachChild = (
@@ -28,6 +34,69 @@ export const getChildByName = (item: ProjectItem, name: string) => {
     }
   }
 };
+
+// Recursively search a given item, provided a nodeId
+export const getItemById = (item: ProjectItem, id: string): ProjectItem | undefined => {
+  // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
+  if (item === undefined) {
+      // alert("case 1: returning undefined");
+      return undefined;
+  }
+  if (item.nodeId === id) {
+      // alert("case 2: returning item");
+      return item;
+  }
+  if (item.type === 2 || item.type === 3) { // only Search BINs and ROOT
+      // alert("case 3: entering for loop on " + item.name + "'s children");
+      for (let i = 0; i < item.children.numItems; i++) {
+          const child = item.children[i];
+          const result = getItemById(child, id);
+          if (result !== undefined) {
+              return result;
+          }
+      }
+  }
+  // alert("case 4: returning undefined");
+  return undefined;
+};
+
+// Recursively search a given item, provided a name
+export const getItemByName = (item: ProjectItem, name: string): ProjectItem | undefined => {
+  // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
+  if (item === undefined) {
+      // alert("case 1: returning undefined");
+      return undefined;
+  }
+  if (item.name === name) {
+      // alert("case 2: returning item");
+      return item;
+  }
+  if (item.type === 2 || item.type === 3) { // only Search BINs and ROOT
+      // alert("case 3: entering for loop on " + item.name + "'s children");
+      for (let i = 0; i < item.children.numItems; i++) {
+          const child = item.children[i];
+          const result = getItemByName(child, name);
+          if (result !== undefined) {
+              return result;
+          }
+      }
+  }
+  // alert("case 4: returning undefined");
+  return undefined;
+};
+
+// Print the name and id for children of an Item
+export const printChildren = (item: ProjectItem) => {
+  let result = "";
+  for (let i = 0; i < item.children.numItems; i++) {
+      const child = item.children[i];
+      result += (child.name + ": " + child.nodeId);
+      if (i !== (item.children.numItems - 1)) {
+          result += ", ";
+      }
+  }
+  return result;
+}
 
 export const getParentItem = (item: ProjectItem) => {
   const dir = item.treePath.split("\\");
