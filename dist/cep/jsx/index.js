@@ -73,21 +73,72 @@ var createBin = function createBin(name) {
 //     }
 // };
 
-// 000f424f - sequence
-// 000f4250 - bin 1
-// 000f4251 - bin 2
-// 000f4252 - bin 3
-// 000f4253 - bin 4
+// 000f4240 - Root
+// 000f424f - Sequence 01
+// 000f4250 - Top
+// 000f4251 - Other
+// 000f4252 - Mid
+// 000f4253 - Low
 
 var testFunc = function testFunc() {
-  // alert(printChildren(myRoot.children[0]));
-  traverseItem(myRoot);
+  // alert(printChildren(myRoot));
+  // traverseItem(myRoot);
+
+  var id = "000f4251";
+  var item = findItemById(myRoot, id);
+  if (item !== undefined) {
+    alert("Found " + item.name + "!");
+  } else {
+    alert("Item with id " + id + " does not exist");
+  }
 };
+
+// --- Test Structure ---
+// Untitled.prproj (000f4240)
+// |- Sequence 01 (000f424f)
+// ||- Top (000f4250)
+// ||-- Mid (000f4252)
+// ||--- Low (000f4253)
+// |- Other (000f4251)
+
+// Recursively search a given item, provided a nodeId
+var findItemById = function findItemById(item, id) {
+  alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
+  if (item === undefined) {
+    alert("case 1: returning undefined");
+    return undefined;
+  }
+  if (item.nodeId === id) {
+    alert("case 2: returning item");
+    return item;
+  }
+  if (item.type === 2 || item.type === 3) {
+    // only Search BINs and ROOT
+    alert("case 3: entering for loop on " + item.name + "'s children");
+    for (var i = 0; i < item.children.numItems; i++) {
+      var child = item.children[i];
+      var result = findItemById(child, id);
+      if (result !== undefined) {
+        return result;
+      }
+    }
+  }
+  alert("case 4: returning undefined");
+  return undefined;
+};
+
+// findItemById(myRoot, 000f4251)
+// 
+
+// traverseItem(myRoot)
+//      alert(myRoot.Name)
+//          traverseItem(Sequence 01)
+
 var printChildren = function printChildren(item) {
   var result = "";
   for (var i = 0; i < item.children.numItems; i++) {
     var child = item.children[i];
-    result += child.name;
+    result += child.name + ": " + child.nodeId;
     if (i !== item.children.numItems - 1) {
       result += ", ";
     }
@@ -95,7 +146,7 @@ var printChildren = function printChildren(item) {
   return result;
 };
 
-// Recursively search a given item
+// Recursively traverse all bins
 var traverseItem = function traverseItem(item) {
   alert(item.name);
   for (var i = 0; i < item.children.numItems; i++) {
@@ -106,11 +157,6 @@ var traverseItem = function traverseItem(item) {
     }
   }
 };
-
-// traverseItem(myRoot)
-//      alert(myRoot.Name)
-//          traverseItem(Sequence 01)
-
 var getRootItem = function getRootItem() {
   return myRoot;
 };
@@ -137,6 +183,7 @@ var ppro = /*#__PURE__*/__objectFreeze({
   alertUser: alertUser,
   createBin: createBin,
   testFunc: testFunc,
+  findItemById: findItemById,
   printChildren: printChildren,
   traverseItem: traverseItem,
   getRootItem: getRootItem
