@@ -21,9 +21,8 @@ export const testFunc = () => {
 };
 
 export const parseText = (text: string) => {
-    // Iterate over text lines
     const lines = text.split("\n");
-    let stack: BinItem[] = [];
+    let stack: BinItem[] = []; // to store top-level groups
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const prefixCount = countConsecPrefixChars(line, "/");
@@ -39,8 +38,27 @@ export const parseText = (text: string) => {
         } else if (line[0] === "/"){
             // Determine where to put sub folder
             // line = line.substring(numSlashes)
+            const topBin = root.createBin(line);
+            stack.push({
+                name: topBin.name,
+                id: topBin.nodeId,
+                prefixCount: prefixCount
+            });
         }
     }
+    printStack(stack);
+}
+
+export const printStack = (stack: BinItem[]) => {
+    let result = "Stack:\n";
+    for (let i = 0; i < stack.length; i++) {
+        const item = stack[i];
+        result += `id: ${item.id}, name: ${item.name}, prefixCount: ${item.prefixCount}`;
+        if (i < stack.length - 1) {
+            result += "\n\n";
+        }
+    }
+    alert(result);
 }
 
 // --- Test Structure ---

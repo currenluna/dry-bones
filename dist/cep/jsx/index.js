@@ -113,9 +113,8 @@ var testFunc = function testFunc() {
   }
 };
 var parseText = function parseText(text) {
-  // Iterate over text lines
   var lines = text.split("\n");
-  var stack = [];
+  var stack = []; // to store top-level groups
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
     var prefixCount = countConsecPrefixChars(line, "/");
@@ -129,8 +128,29 @@ var parseText = function parseText(text) {
         id: topBin.nodeId,
         prefixCount: prefixCount
       });
-    } else if (line[0] === "/") ;
+    } else if (line[0] === "/") {
+      // Determine where to put sub folder
+      // line = line.substring(numSlashes)
+      var _topBin = root.createBin(line);
+      stack.push({
+        name: _topBin.name,
+        id: _topBin.nodeId,
+        prefixCount: prefixCount
+      });
+    }
   }
+  printStack(stack);
+};
+var printStack = function printStack(stack) {
+  var result = "Stack:\n";
+  for (var i = 0; i < stack.length; i++) {
+    var item = stack[i];
+    result += "id: ".concat(item.id, ", name: ").concat(item.name, ", prefixCount: ").concat(item.prefixCount);
+    if (i < stack.length - 1) {
+      result += "\n\n";
+    }
+  }
+  alert(result);
 };
 
 // --- Test Structure ---
@@ -145,7 +165,8 @@ var ppro = /*#__PURE__*/__objectFreeze({
   __proto__: null,
   alertUser: alertUser,
   testFunc: testFunc,
-  parseText: parseText
+  parseText: parseText,
+  printStack: printStack
 });
 
 var main;
