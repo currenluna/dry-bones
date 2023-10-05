@@ -114,11 +114,13 @@ var testFunc = function testFunc() {
 };
 var parseText = function parseText(text) {
   var lines = text.split("\n");
+  alert(lines.toString());
   var stack = []; // to store top-level groups
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
-    var prefixCount = countConsecPrefixChars(line, "/");
-    if (line[0] === "#") {
+    var prefixCount = countConsecPrefixChars(line, "|");
+    line = line.substring(prefixCount);
+    if (line[0] === "#" || line === "") {
       continue;
     } else if (line[0] !== "/") {
       // Top-level folder
@@ -139,13 +141,14 @@ var parseText = function parseText(text) {
       });
     }
   }
-  printStack(stack);
+  // printStack(stack);
 };
+
 var printStack = function printStack(stack) {
   var result = "Stack:\n";
   for (var i = 0; i < stack.length; i++) {
     var item = stack[i];
-    result += "id: ".concat(item.id, ", name: ").concat(item.name, ", prefixCount: ").concat(item.prefixCount);
+    result += "id: ".concat(item.id, "\nname: ").concat(item.name, "\nprefixCount: ").concat(item.prefixCount);
     if (i < stack.length - 1) {
       result += "\n\n";
     }

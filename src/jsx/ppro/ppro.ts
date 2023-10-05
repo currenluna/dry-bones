@@ -22,11 +22,13 @@ export const testFunc = () => {
 
 export const parseText = (text: string) => {
     const lines = text.split("\n");
+    alert(lines.toString());
     let stack: BinItem[] = []; // to store top-level groups
     for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const prefixCount = countConsecPrefixChars(line, "/");
-        if (line[0] === "#") {
+        let line = lines[i];
+        const prefixCount = countConsecPrefixChars(line, "|");
+        line = line.substring(prefixCount);
+        if (line[0] === "#" || line === "") {
             continue;
         } else if (line[0] !== "/") { // Top-level folder
             const topBin = root.createBin(line);
@@ -46,14 +48,14 @@ export const parseText = (text: string) => {
             });
         }
     }
-    printStack(stack);
+    // printStack(stack);
 }
 
 export const printStack = (stack: BinItem[]) => {
     let result = "Stack:\n";
     for (let i = 0; i < stack.length; i++) {
         const item = stack[i];
-        result += `id: ${item.id}, name: ${item.name}, prefixCount: ${item.prefixCount}`;
+        result += `id: ${item.id}\nname: ${item.name}\nprefixCount: ${item.prefixCount}`;
         if (i < stack.length - 1) {
             result += "\n\n";
         }
