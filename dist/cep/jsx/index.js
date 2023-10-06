@@ -76,6 +76,32 @@ var alertUser = function alertUser(message) {
   alert(message);
 };
 
+// Recursively search a given item, provided a nodeId
+var getItemById = function getItemById(item, id) {
+  // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
+  if (item === undefined) {
+    // alert("case 1: returning undefined");
+    return undefined;
+  }
+  if (item.nodeId === id) {
+    // alert("case 2: returning item");
+    return item;
+  }
+  if (item.type === 2 || item.type === 3) {
+    // only Search BINs and ROOT
+    // alert("case 3: entering for loop on " + item.name + "'s children");
+    for (var i = 0; i < item.children.numItems; i++) {
+      var child = item.children[i];
+      var result = getItemById(child, id);
+      if (result !== undefined) {
+        return result;
+      }
+    }
+  }
+  // alert("case 4: returning undefined");
+  return undefined;
+};
+
 // Recursively search a given item, provided a name
 var getItemByName = function getItemByName(item, name) {
   // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
@@ -112,38 +138,75 @@ var testFunc = function testFunc() {
     alert("undefined");
   }
 };
+
+// Read each line from text editor and create bin for each line
+//// create a stack with objects {id, # slashes, name}
+//// iterate over each line
+//// make sure the first readable line isn't a "/"
+//// if first char is not "/", clear stack and add incoming line to stack
+// if first char is a "/", and # slashes is one more than one of the stack objects, find the most recent objects with one less slash and create the folder within that folder
+// if first char is a "/", and the diff in # slashes between current line and last line is greater than 1, throw an error
+//// if first char is a "#", skip over the line
+
 var parseText = function parseText(text) {
   var lines = text.split("\n");
   alert(lines.toString());
-  var stack = []; // to store top-level groups
+  var stack = []; // Stores top-level trees
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
+    // alert(String(line.charAt(0) === "|"));
     var prefixCount = countConsecPrefixChars(line, "|");
-    line = line.substring(prefixCount);
-    if (line[0] === "#" || line === "") {
+    // Comment or empty line
+    if (line.charAt(0) === "#" || line === "") {
+      alert("CASE 1 " + line);
       continue;
-    } else if (line[0] !== "/") {
-      // Top-level folder
+    }
+    // Top-level bin
+    else if (line.charAt(0) !== "|") {
+      alert("CASE 2 " + line);
+      stack = [];
       var topBin = root.createBin(line);
       stack.push({
         name: topBin.name,
         id: topBin.nodeId,
         prefixCount: prefixCount
       });
-    } else if (line[0] === "/") {
-      // Determine where to put sub folder
-      // line = line.substring(numSlashes)
-      var _topBin = root.createBin(line);
-      stack.push({
-        name: _topBin.name,
-        id: _topBin.nodeId,
-        prefixCount: prefixCount
-      });
+    }
+    // Sub-level bin
+    else if (line.charAt(0) === "|") {
+      alert("CASE 3 " + line);
+      var parent = void 0;
+      // Remove prefix from bin name
+      var name = line.substring(prefixCount);
+      // Get parent BinItem from stack
+      var parentBinItem = getStackParent(stack, prefixCount);
+      alert(String(parentBinItem));
+      if (parentBinItem !== undefined) {
+        parent = getItemById(root, parentBinItem.id);
+        var subBin = parent.createBin(name);
+        stack.push({
+          name: subBin.name,
+          id: subBin.nodeId,
+          prefixCount: prefixCount
+        });
+      } else {
+        alert("Syntax error at line ".concat(i + 1, "."));
+      }
     }
   }
-  // printStack(stack);
 };
 
+// Look for most recent parent candidate in stack
+var getStackParent = function getStackParent(stack, count) {
+  for (var i = stack.length - 1; i >= 0; i--) {
+    var storedItem = stack[i];
+    if (count - storedItem.prefixCount === 1) {
+      return storedItem;
+    } else {
+      return undefined;
+    }
+  }
+};
 var printStack = function printStack(stack) {
   var result = "Stack:\n";
   for (var i = 0; i < stack.length; i++) {
@@ -156,19 +219,12 @@ var printStack = function printStack(stack) {
   alert(result);
 };
 
-// --- Test Structure ---
-// Untitled.prproj (000f4240)
-// |- Sequence 01 (000f424f)
-// ||- Top (000f4250)
-// ||-- Mid (000f4252)
-// ||--- Low (000f4253)
-// |- Other (000f4251)
-
 var ppro = /*#__PURE__*/__objectFreeze({
   __proto__: null,
   alertUser: alertUser,
   testFunc: testFunc,
   parseText: parseText,
+  getStackParent: getStackParent,
   printStack: printStack
 });
 

@@ -20,26 +20,32 @@ export const testFunc = () => {
     }
 };
 
+    // Read each line from text editor and create bin for each line
+    //// create a stack with objects {id, # slashes, name}
+    //// iterate over each line
+    //// make sure the first readable line isn't a "/"
+    //// if first char is not "/", clear stack and add incoming line to stack
+    // if first char is a "/", and # slashes is one more than one of the stack objects, find the most recent objects with one less slash and create the folder within that folder
+    // if first char is a "/", and the diff in # slashes between current line and last line is greater than 1, throw an error
+    //// if first char is a "#", skip over the line
+
 export const parseText = (text: string) => {
     const lines = text.split("\n");
     alert(lines.toString());
-    let stack: BinItem[] = []; // to store top-level groups
+    let stack: BinItem[] = []; // Stores top-level trees
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
+        // alert(String(line.charAt(0) === "|"));
         const prefixCount = countConsecPrefixChars(line, "|");
-        line = line.substring(prefixCount);
-        if (line[0] === "#" || line === "") {
+        // Comment or empty line
+        if (line.charAt(0) === "#" || line === "") {
+            alert("CASE 1 " + line);
             continue;
-        } else if (line[0] !== "/") { // Top-level folder
-            const topBin = root.createBin(line);
-            stack.push({
-                name: topBin.name,
-                id: topBin.nodeId,
-                prefixCount: prefixCount
-            });
-        } else if (line[0] === "/"){
-            // Determine where to put sub folder
-            // line = line.substring(numSlashes)
+        }
+        // Top-level bin
+        else if (line.charAt(0) !== "|") {
+            alert("CASE 2 " + line);
+            stack = [];
             const topBin = root.createBin(line);
             stack.push({
                 name: topBin.name,
@@ -47,8 +53,40 @@ export const parseText = (text: string) => {
                 prefixCount: prefixCount
             });
         }
+        // Sub-level bin
+        else if (line.charAt(0) === "|"){
+            alert("CASE 3 " + line);
+            let parent: ProjectItem;
+            // Remove prefix from bin name
+            const name = line.substring(prefixCount);
+            // Get parent BinItem from stack
+            const parentBinItem = getStackParent(stack, prefixCount);
+            alert(String(parentBinItem));
+            if (parentBinItem !== undefined) {
+                parent = getItemById(root, parentBinItem.id)!;
+                const subBin = parent.createBin(name);
+                stack.push({
+                    name: subBin.name,
+                    id: subBin.nodeId,
+                    prefixCount: prefixCount
+                });
+            } else {
+                alert(`Syntax error at line ${i+1}.`);
+            }
+        }
     }
-    // printStack(stack);
+}
+
+// Look for most recent parent candidate in stack
+export const getStackParent = (stack: BinItem[], count: number) => {
+    for (let i = stack.length - 1; i >= 0; i--) {
+        const storedItem = stack[i];
+        if (count - storedItem.prefixCount === 1) {
+            return storedItem;
+        } else {
+            return undefined;
+        }
+    }
 }
 
 export const printStack = (stack: BinItem[]) => {
@@ -62,11 +100,3 @@ export const printStack = (stack: BinItem[]) => {
     }
     alert(result);
 }
-
-// --- Test Structure ---
-// Untitled.prproj (000f4240)
-// |- Sequence 01 (000f424f)
-// ||- Top (000f4250)
-// ||-- Mid (000f4252)
-// ||--- Low (000f4253)
-// |- Other (000f4251)
