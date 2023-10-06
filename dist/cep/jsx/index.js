@@ -102,41 +102,28 @@ var getItemById = function getItemById(item, id) {
   return undefined;
 };
 
-// Recursively search a given item, provided a name
-var getItemByName = function getItemByName(item, name) {
-  // alert("entered function w/ " + item.name + "\nid is " + item.nodeId);
-  if (item === undefined) {
-    // alert("case 1: returning undefined");
-    return undefined;
-  }
-  if (item.name === name) {
-    // alert("case 2: returning item");
-    return item;
-  }
-  if (item.type === 2 || item.type === 3) {
-    // only Search BINs and ROOT
-    // alert("case 3: entering for loop on " + item.name + "'s children");
-    for (var i = 0; i < item.children.numItems; i++) {
-      var child = item.children[i];
-      var result = getItemByName(child, name);
-      if (result !== undefined) {
-        return result;
-      }
-    }
-  }
-  // alert("case 4: returning undefined");
-  return undefined;
-};
-
 var root = app.project.rootItem;
 var testFunc = function testFunc() {
   // const item = getItemById(root, "000f4253");
-  var item = getItemByName(root, "Sequence 02");
-  if (item !== undefined) {
-    alert("Found " + item.name + "!");
-  } else {
-    alert("undefined");
-  }
+  var s = [{
+    name: "n1",
+    id: "id1",
+    prefixCount: 0
+  }, {
+    name: "n2",
+    id: "id2",
+    prefixCount: 1
+  }, {
+    name: "n3",
+    id: "id3",
+    prefixCount: 1
+  }, {
+    name: "n4",
+    id: "id1",
+    prefixCount: 1
+  }];
+  var item = getStackParent(s, 1);
+  alert(String(item === null || item === void 0 ? void 0 : item.id));
 };
 
 // Read each line from text editor and create bin for each line
@@ -150,20 +137,21 @@ var testFunc = function testFunc() {
 
 var parseText = function parseText(text) {
   var lines = text.split("\n");
-  alert(lines.toString());
+  // alert(lines.toString());
   var stack = []; // Stores top-level trees
   for (var i = 0; i < lines.length; i++) {
+    // printStack(stack);
     var line = lines[i];
     // alert(String(line.charAt(0) === "|"));
     var prefixCount = countConsecPrefixChars(line, "|");
     // Comment or empty line
     if (line.charAt(0) === "#" || line === "") {
-      alert("CASE 1 " + line);
+      // alert("CASE 1 " + line);
       continue;
     }
     // Top-level bin
     else if (line.charAt(0) !== "|") {
-      alert("CASE 2 " + line);
+      // alert("CASE 2 " + line);
       stack = [];
       var topBin = root.createBin(line);
       stack.push({
@@ -174,13 +162,13 @@ var parseText = function parseText(text) {
     }
     // Sub-level bin
     else if (line.charAt(0) === "|") {
-      alert("CASE 3 " + line);
+      // alert("CASE 3 " + line);
       var parent = void 0;
       // Remove prefix from bin name
       var name = line.substring(prefixCount);
       // Get parent BinItem from stack
       var parentBinItem = getStackParent(stack, prefixCount);
-      alert(String(parentBinItem));
+      // alert(String(parentBinItem));
       if (parentBinItem !== undefined) {
         parent = getItemById(root, parentBinItem.id);
         var subBin = parent.createBin(name);
@@ -190,7 +178,7 @@ var parseText = function parseText(text) {
           prefixCount: prefixCount
         });
       } else {
-        alert("Syntax error at line ".concat(i + 1, "."));
+        alert("Syntax error at line ".concat(i + 1, ".\n\"").concat(line, "\" is not valid and did not result in a new bin."));
       }
     }
   }
@@ -198,14 +186,18 @@ var parseText = function parseText(text) {
 
 // Look for most recent parent candidate in stack
 var getStackParent = function getStackParent(stack, count) {
+  // printStack(stack);
   for (var i = stack.length - 1; i >= 0; i--) {
+    // alert("HERE");
     var storedItem = stack[i];
+    // alert(String(count - storedItem.prefixCount));
     if (count - storedItem.prefixCount === 1) {
       return storedItem;
     } else {
-      return undefined;
+      continue;
     }
   }
+  return undefined;
 };
 var printStack = function printStack(stack) {
   var result = "Stack:\n";

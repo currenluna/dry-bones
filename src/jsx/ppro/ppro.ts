@@ -12,12 +12,15 @@ const root = app.project.rootItem;
 
 export const testFunc = () => {
     // const item = getItemById(root, "000f4253");
-    const item = getItemByName(root, "Sequence 02");
-    if (item !== undefined) {
-        alert("Found " + item.name + "!");
-    } else {
-        alert("undefined");
-    }
+    const s: BinItem[] = [
+        {name: "n1", id: "id1", prefixCount: 0},
+        {name: "n2", id: "id2", prefixCount: 1},
+        {name: "n3", id: "id3", prefixCount: 1},
+        {name: "n4", id: "id1", prefixCount: 1},
+    
+    ]
+    const item = getStackParent(s, 1);
+    alert(String(item?.id));
 };
 
     // Read each line from text editor and create bin for each line
@@ -31,20 +34,21 @@ export const testFunc = () => {
 
 export const parseText = (text: string) => {
     const lines = text.split("\n");
-    alert(lines.toString());
+    // alert(lines.toString());
     let stack: BinItem[] = []; // Stores top-level trees
     for (let i = 0; i < lines.length; i++) {
+        // printStack(stack);
         let line = lines[i];
         // alert(String(line.charAt(0) === "|"));
         const prefixCount = countConsecPrefixChars(line, "|");
         // Comment or empty line
         if (line.charAt(0) === "#" || line === "") {
-            alert("CASE 1 " + line);
+            // alert("CASE 1 " + line);
             continue;
         }
         // Top-level bin
         else if (line.charAt(0) !== "|") {
-            alert("CASE 2 " + line);
+            // alert("CASE 2 " + line);
             stack = [];
             const topBin = root.createBin(line);
             stack.push({
@@ -55,13 +59,13 @@ export const parseText = (text: string) => {
         }
         // Sub-level bin
         else if (line.charAt(0) === "|"){
-            alert("CASE 3 " + line);
+            // alert("CASE 3 " + line);
             let parent: ProjectItem;
             // Remove prefix from bin name
             const name = line.substring(prefixCount);
             // Get parent BinItem from stack
             const parentBinItem = getStackParent(stack, prefixCount);
-            alert(String(parentBinItem));
+            // alert(String(parentBinItem));
             if (parentBinItem !== undefined) {
                 parent = getItemById(root, parentBinItem.id)!;
                 const subBin = parent.createBin(name);
@@ -71,22 +75,27 @@ export const parseText = (text: string) => {
                     prefixCount: prefixCount
                 });
             } else {
-                alert(`Syntax error at line ${i+1}.`);
+                alert(`Syntax error at line ${i+1}.\n"${line}" is not valid and did not result in a new bin.`);
             }
         }
     }
 }
 
+
 // Look for most recent parent candidate in stack
 export const getStackParent = (stack: BinItem[], count: number) => {
+    // printStack(stack);
     for (let i = stack.length - 1; i >= 0; i--) {
+        // alert("HERE");
         const storedItem = stack[i];
+        // alert(String(count - storedItem.prefixCount));
         if (count - storedItem.prefixCount === 1) {
             return storedItem;
         } else {
-            return undefined;
+            continue;
         }
     }
+    return undefined;
 }
 
 export const printStack = (stack: BinItem[]) => {
