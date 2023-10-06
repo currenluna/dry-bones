@@ -125,33 +125,18 @@ var testFunc = function testFunc() {
   var item = getStackParent(s, 1);
   alert(String(item === null || item === void 0 ? void 0 : item.id));
 };
-
-// Read each line from text editor and create bin for each line
-//// create a stack with objects {id, # slashes, name}
-//// iterate over each line
-//// make sure the first readable line isn't a "/"
-//// if first char is not "/", clear stack and add incoming line to stack
-// if first char is a "/", and # slashes is one more than one of the stack objects, find the most recent objects with one less slash and create the folder within that folder
-// if first char is a "/", and the diff in # slashes between current line and last line is greater than 1, throw an error
-//// if first char is a "#", skip over the line
-
 var parseText = function parseText(text) {
   var lines = text.split("\n");
-  // alert(lines.toString());
   var stack = []; // Stores top-level trees
   for (var i = 0; i < lines.length; i++) {
-    // printStack(stack);
     var line = lines[i];
-    // alert(String(line.charAt(0) === "|"));
     var prefixCount = countConsecPrefixChars(line, "|");
     // Comment or empty line
     if (line.charAt(0) === "#" || line === "") {
-      // alert("CASE 1 " + line);
       continue;
     }
     // Top-level bin
     else if (line.charAt(0) !== "|") {
-      // alert("CASE 2 " + line);
       stack = [];
       var topBin = root.createBin(line);
       stack.push({
@@ -162,13 +147,11 @@ var parseText = function parseText(text) {
     }
     // Sub-level bin
     else if (line.charAt(0) === "|") {
-      // alert("CASE 3 " + line);
       var parent = void 0;
       // Remove prefix from bin name
       var name = line.substring(prefixCount);
       // Get parent BinItem from stack
       var parentBinItem = getStackParent(stack, prefixCount);
-      // alert(String(parentBinItem));
       if (parentBinItem !== undefined) {
         parent = getItemById(root, parentBinItem.id);
         var subBin = parent.createBin(name);
@@ -186,11 +169,8 @@ var parseText = function parseText(text) {
 
 // Look for most recent parent candidate in stack
 var getStackParent = function getStackParent(stack, count) {
-  // printStack(stack);
   for (var i = stack.length - 1; i >= 0; i--) {
-    // alert("HERE");
     var storedItem = stack[i];
-    // alert(String(count - storedItem.prefixCount));
     if (count - storedItem.prefixCount === 1) {
       return storedItem;
     } else {
