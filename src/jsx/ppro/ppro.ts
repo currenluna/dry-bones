@@ -8,6 +8,7 @@ export { alertUser }
 import { countConsecPrefixChars } from "../../shared/shared";
 import type { BinItem } from "../../shared/shared";
 
+// Root for Premiere Project
 const root = app.project.rootItem;
 
 export const testFunc = () => {
@@ -59,7 +60,7 @@ export const parseText = (text: string) => {
                     prefixCount: prefixCount
                 });
             } else {
-                alert(`Syntax error at line ${i+1}.\n"${line}" is not valid and did not result in a new bin.`);
+                alert(`Error at line ${i+1}.\n"${line}" will be skipped.`);
             }
         }
     }

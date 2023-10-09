@@ -12,3 +12,14 @@ declare global {
     __adobe_cep__: __adobe_cep__;
   }
 }
+
+declare interface State {
+  init: boolean;
+  index: number;
+}
+
+declare interface AppInfo {
+  name: string;
+  id: string;
+  version: string;
+}

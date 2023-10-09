@@ -102,6 +102,7 @@ var getItemById = function getItemById(item, id) {
   return undefined;
 };
 
+// Root for Premiere Project
 var root = app.project.rootItem;
 var testFunc = function testFunc() {
   // const item = getItemById(root, "000f4253");
@@ -161,7 +162,7 @@ var parseText = function parseText(text) {
           prefixCount: prefixCount
         });
       } else {
-        alert("Syntax error at line ".concat(i + 1, ".\n\"").concat(line, "\" is not valid and did not result in a new bin."));
+        alert("Error at line ".concat(i + 1, ".\n\"").concat(line, "\" will be skipped."));
       }
     }
   }
