@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { evalTS, subscribeBackgroundColor } from "../lib/utils/bolt";
+    import { initPrefs } from "../main/prefs";
 
     let textArea = `# Sample 1
 # Comments start with "#"
@@ -12,7 +13,7 @@
 
 01 Cuts
 |00 Archive
-
+ 
 02 Footage
 |01 Raw
 |02 Proxies
@@ -95,7 +96,7 @@
         </div>
         <textarea class="text-editor" bind:value={textArea}></textarea>
         <div class="button-container">
-            <button class="button-outline" on:click={testFunc}>Load</button>
+            <button class="button-outline" on:click={initPrefs}>Load</button>
             <button class="button-solid" on:click={parseText}>Run</button>
         </div>
         <div class="credit">

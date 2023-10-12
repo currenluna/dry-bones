@@ -12,16 +12,17 @@ import type { BinItem } from "../../shared/shared";
 const root = app.project.rootItem;
 
 export const testFunc = () => {
-    // const item = getItemById(root, "000f4253");
-    const s: BinItem[] = [
-        {name: "n1", id: "id1", prefixCount: 0},
-        {name: "n2", id: "id2", prefixCount: 1},
-        {name: "n3", id: "id3", prefixCount: 1},
-        {name: "n4", id: "id1", prefixCount: 1},
+    // // const item = getItemById(root, "000f4253");
+    // const s: BinItem[] = [
+    //     {name: "n1", id: "id1", prefixCount: 0},
+    //     {name: "n2", id: "id2", prefixCount: 1},
+    //     {name: "n3", id: "id3", prefixCount: 1},
+    //     {name: "n4", id: "id1", prefixCount: 1},
     
-    ]
-    const item = getStackParent(s, 1);
-    alert(String(item?.id));
+    // ]
+    // const item = getStackParent(s, 1);
+    // alert(String(item?.id));
+
 };
 
 export const parseText = (text: string) => {

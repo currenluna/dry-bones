@@ -105,26 +105,16 @@ var getItemById = function getItemById(item, id) {
 // Root for Premiere Project
 var root = app.project.rootItem;
 var testFunc = function testFunc() {
-  // const item = getItemById(root, "000f4253");
-  var s = [{
-    name: "n1",
-    id: "id1",
-    prefixCount: 0
-  }, {
-    name: "n2",
-    id: "id2",
-    prefixCount: 1
-  }, {
-    name: "n3",
-    id: "id3",
-    prefixCount: 1
-  }, {
-    name: "n4",
-    id: "id1",
-    prefixCount: 1
-  }];
-  var item = getStackParent(s, 1);
-  alert(String(item === null || item === void 0 ? void 0 : item.id));
+  // // const item = getItemById(root, "000f4253");
+  // const s: BinItem[] = [
+  //     {name: "n1", id: "id1", prefixCount: 0},
+  //     {name: "n2", id: "id2", prefixCount: 1},
+  //     {name: "n3", id: "id3", prefixCount: 1},
+  //     {name: "n4", id: "id1", prefixCount: 1},
+
+  // ]
+  // const item = getStackParent(s, 1);
+  // alert(String(item?.id));
 };
 var parseText = function parseText(text) {
   var lines = text.split("\n");
