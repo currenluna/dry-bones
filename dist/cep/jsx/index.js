@@ -118,6 +118,12 @@ var testFunc = function testFunc() {
 };
 var parseText = function parseText(text) {
   var lines = text.split("\n");
+  var m = "";
+  for (var x = 0; x < lines.length; x++) {
+    m += lines[x];
+    m += "\n";
+  }
+  alert(m);
   var stack = []; // Stores top-level trees
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];

@@ -27,6 +27,12 @@ export const testFunc = () => {
 
 export const parseText = (text: string) => {
     const lines = text.split("\n");
+    let m = "";
+    for (let x = 0; x < lines.length; x++) {
+        m += lines[x];
+        m += "\n";
+    }
+    alert(m);
     let stack: BinItem[] = []; // Stores top-level trees
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
