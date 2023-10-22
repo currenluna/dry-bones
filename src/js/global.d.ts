@@ -16,6 +16,7 @@ declare global {
 declare interface State {
   init: boolean;
   index: number;
+  bones: string[];
 }
 
 declare interface AppInfo {

@@ -6,7 +6,7 @@ import { defaultState } from "./store";
 export const prefsFunc = () => {
     alert(platform);
     console.log("hi");
-}
+};
 
 const platform = os.platform();
 
