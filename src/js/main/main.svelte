@@ -5,7 +5,10 @@
     import { getState, initPrefs, saveState } from "./prefs";
 
     let textArea = "";
-
+    let time = new Date();
+    $: hours = time.getHours();
+	$: minutes = time.getMinutes();
+	$: seconds = time.getSeconds();
 
     let backgroundColor: string = "#282c34";
         
@@ -32,28 +35,29 @@
             initPrefs();
             // read from JSON file
             const existingState = getState();
-
-            let { appVersion: version, appId: id } = csi.getHostEnvironment();
-            id = (id as string).toLowerCase();
-            const name = "ppro";
-            $appInfo = { name, id, version };
+            const interval = setInterval(() => {
+			time = new Date();
+            }, 1000);
 
             if (existingState) $state = existingState;
-
-            let x = 2;
+            
+            console.log('hi');
             state.subscribe((val) => {
                 console.log("state changed", val);
                 textArea = val.bones[0];
-                saveState(val);
+                // saveState(val);
             });
+            return () => {
+                clearInterval(interval);
+            };
         }
     })
 
+    // Called on text area change
+    // -- should access the correct bone index to save the textArea value, once tabs are implemented
     const save = () => {
-        state.subscribe((val) => {
-                console.log("state changed", val);
-                saveState(val);
-        });
+        $state.bones[0] = textArea;
+        saveState($state);
     }
 </script>
 
@@ -72,6 +76,7 @@
         <div class="credit">
             <a href="https://icons8.com/icon/DIMe9ZTnqdy3/fish-bone">Fish Bone</a> icon by <a href="https://icons8.com">Icons8</a>
         </div>
+        <p>{seconds}</p>
     </div>
 </div>
 
