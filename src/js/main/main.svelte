@@ -4,7 +4,12 @@
     import { state, appInfo, helpDialog } from "./store";
     import { getState, initPrefs, saveState } from "./prefs";
 
+    import Modal from "./Modal.svelte"
+
     let textArea = "";
+
+    let shown = false;
+    let modalHelp: Modal;
 
     let changing = false;
     // $: saveStatus = changing ? "Saving" : "Changes saved";
@@ -71,6 +76,7 @@
         <div class="header">
             <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAYAAAA4qEECAAAACXBIWXMAAAsTAAALEwEAmpwYAAADE0lEQVR4nO2du2sVQRSHP1ZRb1BMbBRfpY29UUuxCoJaiJ2VIIJ2YqMWSkBBRTHKTSs2IoKVguB/4KMKWNj6AvNQY4zGx8rgDF4ku7m7d7M7mfl9cKp7d2b2Y5jdObucBSGEEEII8Y8twDDwHPgCTAPPgAvA5o7/iZKsAa4Bc0CaEd+Bq8Dqsp3EzjbgZY7g/+MVsL3pQS81hoCPBSS7+AwcaHrwS4VjwK8Skl2YY482fRK+c6RHyS5+S3Y2h4GfFUh2Ydo6lNNflOwCvlUo2cUssLPpk/OFjcCbRZDs4p3utWEV8GIRJbt4CqwkYm7VINnFdSJln707qEu06Ws/kbEBmKhRsosPwHoi4n4Dkl3cJaIlI204DhI4a4HXHoh+CwwQMDc8kOzCjCVYJj0Q7GKcgJnwQHDnHUiwXPFAsAszlmBZYU9wvOEl47Idi5iHLHGiYlKJrodUoiU6KFLNaIn2jj6b7C/zzkZVMQXcBFoEzKgHGxUXZixBkgBfPRDsYsaOKTgSiY5z6WgTMC1gxF6QmhI8aXPRQV8MeyFLnKiYVKLrIZVoiQ6KVDNaor2mr8a8RxT5DZ82L8HmN3zbjs+Emt/IIpHosJeONhHSqjHvofxGAbIkiopJJboeUomW6KBINaMlOrocyFTMOY0mNjLR5TSa2prPxJbTKEoi0Utr6WjXON4ocyCTemejd3QfXROpNiwSHQwDOTO6v+nBhcTuHNGmwpioiJEc0dHWSqqarbbmaJboTyq31jvLgcdd3D8/ApZV0F+02/E7BTYrt5XfKI6p5PWwxM7wCbCpRH/RsQ44u0ABlR82sn43x56xbQn+JvjNhW4QOAk8sPX7F5q1pr708S7+N23bPAHssH2ZPqOgr8c3SM93tDVcso0onsKMlpRjinefmqe90z0U9g72KUxSMqlvatTtyWl3L/C+RLvBPoVJCoqes58G6SaX0W93iHmfEYlGdLdLhymsfdF+5KYo5phLXc7wdixPT2atkDHgnr2tG6xoliW25Pw52/aY7cv0qacwQgghhBBCCEEHfwAEI1+0Z6xilQAAAABJRU5ErkJggg==">
             <h1>Dry Bones</h1>
+            <button on:click={() => {modalHelp.show()}}>?</button>
         </div>
         <textarea class="text-editor" bind:value={textArea} on:keydown={save}></textarea>
         <div class="button-container">
@@ -88,12 +94,17 @@
             {/if}
         </div>
     </div>
+    <Modal bind:this={modalHelp}>
+        <p><b>Dry Bones</b> is the fastest way to organize your project.</p>
+        <p>To manage the bones on your system, press <b>Set</b>.</p>
+        <p>When you edit your bones, they will automatically save.</p>
+        <p>To add the opened bones to your project, press <b>Run</b>.</p>
+        <p>Curren Taber &copy 2023</p>
+    </Modal>
 </div>
 
 <style lang="scss">
     $border-radius: 5px;
-
-
     .app {
         background-color: var(--background-color);
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
